@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لمحة ميديا — إنتاج، تصوير، ومونتاج</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#100B06;
+    --bg-soft:#180F08;
+    --surface:#1F140A;
+    --surface-2:#28190C;
+    --line: rgba(255,196,120,0.14);
+    --line-strong: rgba(255,178,90,0.3);
+    --text:#FBF3E7;
+    --text-muted:#C7B49B;
+    --yellow:#FFCB3D;
+    --orange:#FF7E1F;
+    --red:#FF4423;
+    --grad: linear-gradient(120deg, var(--yellow) 0%, var(--orange) 55%, var(--red) 100%);
+    --font-d:'Cairo', sans-serif;
+    --font-b:'Tajawal', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-b);
+    line-height:1.7;
+    overflow-x:hidden;
+    font-variant-numeric:tabular-nums;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--font-d);font-weight:700;font-size:13px;
+    letter-spacing:1px;color:var(--orange);
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";width:9px;height:9px;border-radius:2px;
+    background:var(--grad); transform:rotate(45deg);
+    box-shadow:0 0 10px rgba(255,126,31,.6);
+  }
+  h1,h2,h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.5px;}
+  .muted{color:var(--text-muted);}
+
+  /* GRAIN TEXTURE */
+  .grain{
+    position:fixed;inset:0;z-index:998;pointer-events:none;
+    opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* SCROLL PROGRESS */
+  .progress{position:fixed;top:0;right:0;left:0;height:3px;z-index:999;background:transparent;}
+  .progress i{display:block;height:100%;width:0%;background:var(--grad);transition:width .1s linear;}
+
+  /* PRELOADER */
+  #preloader{
+    position:fixed;inset:0;z-index:1000;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  #preloader img{width:84px;animation:preSpin 1.1s ease-in-out infinite alternate;}
+  @keyframes preSpin{0%{transform:scale(.85) rotate(-6deg);opacity:.5;}100%{transform:scale(1.05) rotate(0deg);opacity:1;}}
+  #preloader.done{opacity:0;visibility:hidden;}
+
+  /* REVEAL */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.16,.8,.24,1), transform .8s cubic-bezier(.16,.8,.24,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+  .grid .card{transition:transform .35s cubic-bezier(.16,.8,.24,1), box-shadow .35s, border-color .35s, opacity .8s, translate .8s;}
+  .grid.videos .card:nth-child(1){transition-delay:.02s} .grid.videos .card:nth-child(2){transition-delay:.08s}
+  .grid.videos .card:nth-child(3){transition-delay:.14s} .grid.videos .card:nth-child(4){transition-delay:.2s}
+  .grid.videos .card:nth-child(5){transition-delay:.26s} .grid.videos .card:nth-child(6){transition-delay:.32s}
+  .grid.posts .card:nth-child(1){transition-delay:.02s} .grid.posts .card:nth-child(2){transition-delay:.06s}
+  .grid.posts .card:nth-child(3){transition-delay:.1s} .grid.posts .card:nth-child(4){transition-delay:.14s}
+  .grid.posts .card:nth-child(5){transition-delay:.18s} .grid.posts .card:nth-child(6){transition-delay:.22s}
+  .grid.posts .card:nth-child(7){transition-delay:.26s} .grid.posts .card:nth-child(8){transition-delay:.3s}
+
+  /* NAV */
+  header{
+    position:fixed;top:0;right:0;left:0;z-index:100;
+    backdrop-filter:blur(14px);
+    background:rgba(16,11,6,.72);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 28px;max-width:1180px;margin:0 auto;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand img{width:38px;height:38px;object-fit:contain;}
+  .brand span{font-family:var(--font-d);font-weight:900;font-size:20px;}
+  nav ul{display:none;list-style:none;gap:30px;}
+  @media(min-width:860px){nav ul{display:flex;}}
+  nav ul a{
+    font-family:var(--font-d);font-weight:700;font-size:15px;
+    color:var(--text-muted);transition:color .2s;position:relative;
+  }
+  nav ul a::after{content:"";position:absolute;right:0;bottom:-6px;width:0;height:2px;background:var(--grad);transition:width .3s;}
+  nav ul a:hover{color:var(--yellow);}
+  nav ul a:hover::after{width:100%;}
+  .btn{
+    font-family:var(--font-d);font-weight:800;font-size:14px;
+    padding:11px 22px;border-radius:10px;border:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;
+    transition:transform .25s, filter .25s, box-shadow .25s;
+  }
+  .btn-grad{background:var(--grad);color:#180E04;box-shadow:0 6px 20px rgba(255,110,20,.25);}
+  .btn-grad:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,110,20,.4);}
+  .nav-cta{display:none;}
+  @media(min-width:860px){.nav-cta{display:inline-flex;}}
+  .burger{display:block;background:none;border:none;color:var(--text);font-size:26px;cursor:pointer;}
+  @media(min-width:860px){.burger{display:none;} }
+
+  /* HERO */
+  .hero{
+    position:relative;min-height:100vh;display:flex;align-items:center;
+    padding:150px 0 70px;
+    background:var(--bg);
+    overflow:hidden;
+    --mx:50%; --my:35%;
+  }
+  .hero-glow{
+    position:absolute;inset:-20% -10% auto -10%;height:900px;
+    background:var(--grad);
+    filter:blur(140px);opacity:.26;
+    animation:pulse 8s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .hero-cursor-glow{
+    position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(420px circle at var(--mx) var(--my), rgba(255,150,40,.16), transparent 70%);
+    transition:background .1s;
+  }
+  @keyframes pulse{0%,100%{opacity:.2;}50%{opacity:.34;}}
+  .hero-inner{
+    position:relative;z-index:2;display:grid;gap:46px;
+    grid-template-columns:1fr;align-items:center;text-align:center;
+  }
+  @media(min-width:900px){
+    .hero-inner{grid-template-columns:1.1fr .9fr;text-align:right;}
+  }
+  .hero h1{
+    font-size:clamp(38px,6vw,68px);line-height:1.15;margin-bottom:22px;
+  }
+  .hero h1 span.word{display:inline-block;opacity:0;transform:translateY(22px);animation:wordIn .7s cubic-bezier(.16,.8,.24,1) forwards;}
+  @keyframes wordIn{to{opacity:1;transform:translateY(0);}}
+  .hero h1 .hl{
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{font-size:18px;color:var(--text-muted);max-width:560px;margin-bottom:32px;opacity:0;animation:fadeUp .8s .6s cubic-bezier(.16,.8,.24,1) forwards;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .8s .8s cubic-bezier(.16,.8,.24,1) forwards;}
+  @media(min-width:900px){.hero-actions{justify-content:flex-start;} .hero p{margin-inline:0;}}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--orange);color:var(--yellow);transform:translateY(-2px);}
+  .hero-logo-holder{
+    position:relative;display:flex;justify-content:center;
+    animation:floatY 5s ease-in-out infinite, popIn 1s .3s cubic-bezier(.16,.8,.24,1) both;
+  }
+  @keyframes floatY{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-14px) rotate(1.5deg);}}
+  @keyframes popIn{from{opacity:0;transform:scale(.8) translateY(30px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  .hero-logo-holder img{
+    width:min(360px,70vw);filter:drop-shadow(0 30px 60px rgba(255,80,20,.35));
+  }
+  .scroll-cue{
+    position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    color:var(--text-muted);font-size:12px;letter-spacing:2px;
+    animation:cueBounce 2s ease-in-out infinite;
+  }
+  @keyframes cueBounce{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,8px);}}
+
+  /* MARQUEE */
+  .marquee-wrap{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:var(--bg-soft);overflow:hidden;padding:18px 0;
+  }
+  .marquee-track{display:flex;width:max-content;animation:scrollX 26s linear infinite;}
+  .marquee-track span{
+    font-family:var(--font-d);font-weight:800;font-size:20px;
+    color:var(--text-muted);padding:0 26px;white-space:nowrap;display:flex;align-items:center;gap:26px;
+  }
+  .marquee-track span b{
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  @keyframes scrollX{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* SECTION shared */
+  section{padding:110px 0;position:relative;}
+  .sec-head{max-width:640px;margin-bottom:56px;}
+  .sec-head.center{margin-inline:auto;text-align:center;}
+  .sec-head h2{font-size:clamp(28px,4vw,42px);}
+
+  /* ABOUT */
+  .about{background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .about-grid{display:grid;gap:50px;grid-template-columns:1fr;}
+  @media(min-width:900px){.about-grid{grid-template-columns:1fr 1fr;align-items:start;}}
+  .about-text p{color:var(--text-muted);font-size:16.5px;margin-bottom:18px;}
+  .about-text strong{color:var(--text);font-weight:700;}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .stat-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:24px 20px;transition:.3s;
+  }
+  .stat-card:hover{border-color:var(--orange);transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.35);}
+  .stat-card .num{
+    font-family:var(--font-d);font-weight:900;font-size:32px;
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .stat-card .lbl{color:var(--text-muted);font-size:14px;margin-top:6px;}
+
+  /* GRID CARDS (videos/posts) */
+  .grid{display:grid;gap:22px;grid-template-columns:1fr;}
+  @media(min-width:700px){.grid{grid-template-columns:1fr 1fr;}}
+  @media(min-width:1050px){.grid.videos{grid-template-columns:1fr 1fr 1fr;}}
+  @media(min-width:1050px){.grid.posts{grid-template-columns:1fr 1fr 1fr 1fr;}}
+
+  .card{
+    border-radius:18px;overflow:hidden;background:var(--surface);
+    border:1px solid var(--line);position:relative;
+  }
+  .card:hover{transform:translateY(-6px);border-color:var(--orange);box-shadow:0 20px 44px rgba(0,0,0,.45);}
+  .video-thumb{
+    aspect-ratio:9/13;position:relative;overflow:hidden;
+    background:linear-gradient(160deg,#2A1B0C,#180F06);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .video-thumb::after{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 50% 40%, rgba(255,126,31,.18), transparent 65%);
+  }
+  .play-btn{
+    width:58px;height:58px;border-radius:50%;background:var(--grad);
+    display:flex;align-items:center;justify-content:center;z-index:2;
+    box-shadow:0 8px 24px rgba(255,90,20,.45);transition:transform .3s;
+  }
+  .card:hover .play-btn{transform:scale(1.12);}
+  .play-btn svg{width:20px;height:20px;fill:#180E04;margin-inline-start:3px;}
+  .card-body{padding:16px 18px;}
+  .card-body h4{font-family:var(--font-d);font-size:16px;font-weight:700;margin-bottom:4px;}
+  .card-body span{color:var(--text-muted);font-size:13px;}
+  .post-thumb{aspect-ratio:4/5;background:linear-gradient(160deg,#2A1B0C,#180F06);}
+
+  /* RESULTS - real case study */
+  .results{background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .case-card{
+    background:linear-gradient(180deg, var(--surface), var(--surface-2));
+    border:1px solid var(--line-strong);border-radius:26px;
+    padding:44px clamp(20px,4vw,52px);position:relative;overflow:hidden;
+  }
+  .case-card::before{
+    content:"";position:absolute;top:-40%;left:-10%;width:60%;height:180%;
+    background:var(--grad);opacity:.12;filter:blur(90px);pointer-events:none;
+  }
+  .case-top{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;position:relative;z-index:2;margin-bottom:10px;}
+  .case-badge{
+    font-family:var(--font-d);font-weight:700;font-size:12.5px;color:var(--yellow);
+    border:1px solid var(--line-strong);padding:6px 14px;border-radius:20px;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .case-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:#5CFF9B;box-shadow:0 0 8px #5CFF9B;}
+  .case-period{color:var(--text-muted);font-size:13.5px;}
+  .case-headline{font-size:clamp(22px,3vw,30px);margin:14px 0 40px;position:relative;z-index:2;max-width:760px;}
+
+  .platform-row{display:grid;gap:22px;grid-template-columns:1fr;position:relative;z-index:2;}
+  @media(min-width:860px){.platform-row{grid-template-columns:1fr 1fr;}}
+  .platform-panel{
+    background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:20px;padding:28px;
+  }
+  .platform-head{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
+  .platform-head .ic{
+    width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);flex-shrink:0;
+  }
+  .platform-head .ic svg{width:20px;height:20px;fill:#180E04;}
+  .platform-head h3{font-size:18px;}
+  .metric-list{display:grid;gap:18px;grid-template-columns:1fr 1fr;}
+  .metric-list.single{grid-template-columns:1fr;}
+  .metric{}
+  .metric .n{
+    font-family:var(--font-d);font-weight:900;font-size:clamp(24px,3vw,32px);
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+    display:block;
+  }
+  .metric .l{color:var(--text-muted);font-size:13px;margin-top:4px;}
+  .metric.grow .n{color:#5CFF9B;background:none;-webkit-text-fill-color:currentColor;}
+  .breakdown{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;}
+  .breakdown-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--text-muted);}
+  .breakdown-row b{color:var(--text);font-family:var(--font-d);}
+  .breakdown-bar{height:6px;border-radius:4px;background:var(--surface-2);overflow:hidden;margin-top:4px;}
+  .breakdown-bar i{display:block;height:100%;background:var(--grad);border-radius:4px;width:0;transition:width 1.4s cubic-bezier(.16,.8,.24,1);}
+
+  /* CONTACT */
+  .contact{
+    position:relative;overflow:hidden;text-align:center;
+    background:
+      radial-gradient(ellipse 80% 70% at 50% 100%, rgba(255,126,31,.28), transparent 60%),
+      var(--bg);
+  }
+  .contact .sec-head{margin-inline:auto;}
+  .contact-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:30px;}
+  .contact-info{
+    margin-top:50px;display:flex;gap:40px;justify-content:center;flex-wrap:wrap;
+    color:var(--text-muted);font-size:15px;
+  }
+  .contact-info b{color:var(--text);display:block;font-family:var(--font-d);margin-bottom:4px;}
+  .wa-btn{background:#25D366;color:#0B1A10;}
+  .wa-btn:hover{filter:brightness(1.06);transform:translateY(-2px);}
+
+  /* FLOATING WHATSAPP */
+  .float-wa{
+    position:fixed;bottom:26px;left:26px;z-index:200;
+    width:60px;height:60px;border-radius:50%;
+    background:#25D366;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 26px rgba(37,211,102,.45);
+    animation:floatPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes floatPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+  .float-wa svg{width:30px;height:30px;fill:#0B1A10;}
+
+  footer{
+    border-top:1px solid var(--line);padding:40px 0;
+    display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center;
+    color:var(--text-muted);font-size:14px;
+  }
+  footer .brand span{font-size:17px;}
+
+  /* mobile nav */
+  .mobile-menu{
+    position:fixed;inset:0;z-index:150;background:var(--bg);
+    display:none;flex-direction:column;align-items:center;justify-content:center;gap:30px;
+  }
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{font-family:var(--font-d);font-weight:800;font-size:22px;}
+  .mobile-close{position:absolute;top:24px;left:24px;background:none;border:none;color:var(--text);font-size:30px;}
+
+  ::selection{background:var(--orange);color:#180E04;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="preloader"><img src="2lamha.png" alt="لمحة ميديا"></div>
+<div class="grain"></div>
+<div class="progress"><i id="progressBar"></i></div>
+
+<header>
+  <div class="nav">
+    <div class="brand">
+      <img src="4lamha.png" alt="لمحة ميديا" >
+      <span>لمحة ميديا</span>
+    </div>
+    <nav><ul>
+      <li><a href="#home">الرئيسية</a></li>
+      <li><a href="#about">من نحن</a></li>
+      <li><a href="#videos">الفيديوهات</a></li>
+      <li><a href="#posts">البوستات</a></li>
+      <li><a href="#results">النتائج</a></li>
+      <li><a href="#contact">تواصل</a></li>
+    </ul></nav>
+    <a href="#contact" class="btn btn-grad nav-cta">ابدأ مشروعك</a>
+    <button class="burger" onclick="document.getElementById('mmenu').classList.add('open')">☰</button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mmenu">
+  <button class="mobile-close" onclick="document.getElementById('mmenu').classList.remove('open')">×</button>
+  <a href="#home" onclick="document.getElementById('mmenu').classList.remove('open')">الرئيسية</a>
+  <a href="#about" onclick="document.getElementById('mmenu').classList.remove('open')">من نحن</a>
+  <a href="#videos" onclick="document.getElementById('mmenu').classList.remove('open')">الفيديوهات</a>
+  <a href="#posts" onclick="document.getElementById('mmenu').classList.remove('open')">البوستات</a>
+  <a href="#results" onclick="document.getElementById('mmenu').classList.remove('open')">النتائج</a>
+  <a href="#contact" onclick="document.getElementById('mmenu').classList.remove('open')">تواصل</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-cursor-glow" id="heroCursor"></div>
+  <div class="wrap hero-inner">
+    <div>
+      <div class="eyebrow" style="opacity:0;animation:fadeUp .7s .1s cubic-bezier(.16,.8,.24,1) forwards;">إنتاج · تصوير · مونتاج</div>
+      <h1>
+        <span class="word" style="animation-delay:.15s">لحظة</span>
+        <span class="word" style="animation-delay:.22s">واحدة</span>
+        <span class="word" style="animation-delay:.29s">كافية</span><br>
+        <span class="word" style="animation-delay:.36s">لتصنع</span>
+        <span class="word hl" style="animation-delay:.43s">لمحة</span>
+        <span class="word" style="animation-delay:.5s">لا</span>
+        <span class="word" style="animation-delay:.57s">تُنسى</span>
+      </h1>
+      <p>نحوّل الفكرة إلى صورة، والصورة إلى أثر. لمحة ميديا شركة إنتاج بصري تبني كل عمل على أساس واضح: انتباه يُلتقط من أول ثانية، وسرد يستحق أن يُعاد مشاهدته.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-grad">تواصل معنا</a>
+        <a href="#results" class="btn btn-ghost">شاهد نتائجنا الحقيقية</a>
+      </div>
+    </div>
+    <div class="hero-logo-holder">
+      <img src="2lamha.png" alt="شعار لمحة ميديا">
+    </div>
+  </div>
+  <div class="scroll-cue">مرّر للأسفل ↓</div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>
+      <b>تصوير سينمائي</b> · موشن جرافيك · <b>هوية بصرية</b> · مونتاج احترافي · <b>هندسة انتباه</b> · إنتاج محتوى · <b>استراتيجية نمو</b> · تصميم بوستات
+      <b>تصوير سينمائي</b> · موشن جرافيك · <b>هوية بصرية</b> · مونتاج احترافي · <b>هندسة انتباه</b> · إنتاج محتوى · <b>استراتيجية نمو</b> · تصميم بوستات
+    </span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div class="reveal">
+      <div class="eyebrow">من نحن</div>
+      <h2 style="margin-bottom:24px;">شركة أسّسها صانعا محتوى، لا مكتب تسويق</h2>
+      <div class="about-text">
+        <p><strong>لمحة ميديا</strong> شركة إنتاج ومونتاج وتصوير أسّسها <strong>ياسين</strong> و<strong>خليل</strong> من قناعة واحدة: المحتوى الجيد لا يُصادَف، بل يُهندَس بعناية من أول فكرة إلى آخر كادر.</p>
+        <p>نعمل بمنطق واحد لكل مشروع: هوك يمسك الانتباه خلال ثوانٍ، سرد بصري يحافظ عليه، ومونتاج مبني على فهم حقيقي لكيف يتفاعل الجمهور مع المحتوى — لا مجرد "قص ولصق" جميل الشكل.</p>
+        <p>نصوّر، نصمم موشن جرافيك، ونبني هوية بصرية كاملة لعلامتك أو قناتك — بمعيار واحد: أن يكون العمل جاهزًا للنشر دون الحاجة لإعادة التفكير فيه.</p>
+      </div>
+    </div>
+    <div class="stat-grid reveal">
+      <div class="stat-card"><div class="num" data-target="15.3" data-suffix="M+" data-decimals="1">٠</div><div class="lbl">مشاهدة حققناها لعميل واحد خلال سنة</div></div>
+      <div class="stat-card"><div class="num" data-target="48.8" data-suffix="K+" data-decimals="1">٠</div><div class="lbl">مشترك جديد على يوتيوب لنفس العميل</div></div>
+      <div class="stat-card"><div class="num" data-target="421.9" data-suffix="K" data-decimals="1">٠</div><div class="lbl">ساعة مشاهدة على المحتوى الذي أنتجناه</div></div>
+      <div class="stat-card"><div class="num" data-target="3545" data-suffix="%+" data-decimals="0">٠</div><div class="lbl">نمو متابعين انستغرام خلال نفس الفترة</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEOS -->
+<section id="videos">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">أعمالنا</div>
+      <h2>فيديوهات صوّرناها ومونتجناها</h2>
+      <p class="muted" style="margin-top:14px;">اختيار من الأعمال — كل فيديو مبني بمنطق هوك + احتفاظ بالانتباه.</p>
+    </div>
+    <div class="grid videos">
+      <!-- ⬇︎ استبدل كل video-thumb برابط تضمين حقيقي (يوتيوب Shorts / Reels) واستبدل الصورة الخلفية بصورة مصغّرة حقيقية -->
+      <a class="card reveal" >
+        <div >
+    <video width="100%" height="100%" controls>
+        <source src="2q.mp4" type="video/mp4">
+    </video>
+</div>
+        <div class="card-body"><h4>مطعم  </h4></div>
+      </a>
+      <a class="card reveal" >
+        <div >
+    <video width="100%" height="100%" controls>
+        <source src="3q.mp4" type="video/mp4">
+    </video>
+    </div>
+        <div class="card-body"><h4>  مطعم</h4></div>
+      </a>
+      <a class="card reveal" >
+        <div >
+    <video width="100%" height="100%" controls>
+        <source src="12q.mp4" type="video/mp4">
+    </video>
+    </div>
+        <div class="card-body"><h4>تعليمي  </h4></div>
+      </a>
+       <a class="card reveal" >
+        <div >
+    <video width="100%" height="100%" controls>
+        <source src="5q.mp4" type="video/mp4">
+    </video>
+    </div>
+        <div class="card-body"><h4>تعليمي  </h4></div>
+      </a>
+       <a class="card reveal" >
+        <div >
+    <video width="100%" height="100%" controls>
+        <source src="123q.mp4" type="video/mp4">
+    </video>
+    </div>
+        <div class="card-body"><h4>عيادة</h4></div>
+      </a>
+      <a class="card reveal" >
+        <div >
+    <video width="100%" height="100%" controls>
+        <source src="9q.mp4" type="video/mp4">
+    </video>
+    </div>
+        <div class="card-body"><h4>تعليمي</h4></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- POSTS -->
+<section id="posts">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">تصاميم</div>
+      <h2>بوستات صمّمناها</h2>
+      <p class="muted" style="margin-top:14px;">هوية بصرية وتصاميم سوشيال ميديا لعملائنا.</p>
+    </div>
+    <div class="grid posts">
+      <!-- ⬇︎ استبدل post-thumb بصورة البوست الحقيقية (background-image أو <img>) -->
+     <div class="card reveal">
+    <div class="">
+        <img src="6.jpg" alt="صورة">
+    </div>
+</div>
+       <div class="card reveal">
+    <div class="">
+        <img src="5.jpg" alt="صورة">
+    </div>
+</div>
+       <div class="card reveal">
+    <div class="">
+        <img src="2.jpg" alt="صورة">
+    </div>
+</div>
+       <div class="card reveal">
+    <div class="">
+        <img src="3.jpg" alt="صورة">
+    </div>
+</div>
+      <div class="card reveal">
+    <div class="">
+        <img src="11.jpg" alt="صورة">
+    </div>
+    </div>
+      <div class="card reveal">
+    <div class="">
+        <img src="12.jpg" alt="صورة">
+    </div>
+</div>
+       <div class="card reveal">
+    <div class="">
+        <img src="13.png" alt="صورة">
+    </div>
+</div>
+       <div class="card reveal">
+    <div class="">
+        <img src="14.jpg" alt="صورة">
+    </div>
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS — real case study -->
+<section class="results" id="results">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">دراسة حالة حقيقية</div>
+      <h2>نتائج تحققت خلال سنة واحدة من العمل معنا</h2>
+      <p class="muted" style="margin-top:14px;">أرقام فعلية من إحدى القنوات التي أدرنا محتواها البصري لها — من لوحات التحكم مباشرة.</p>
+    </div>
+
+    <div class="case-card reveal">
+      <div class="case-top">
+        <span class="case-badge">قناة عميل حقيقي — نتائج موثّقة</span>
+        <span class="case-period">فترة العمل: سنة واحدة تقريبًا</span>
+      </div>
+      <h3 class="case-headline">من محتوى محدود الانتشار إلى <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;">+15 مليون مشاهدة</span> وآلاف المتابعين الجدد — بنفس فريق التصوير والمونتاج.</h3>
+
+      <div class="platform-row">
+        <div class="platform-panel">
+          <div class="platform-head">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M21.8 8.001s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16 5 12 5 12 5s-4 0-6.9.1c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.6c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.9.8 2.4.9C7.2 19 12 19 12 19s4 0 6.9-.1c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.6c0-1.6-.2-3.2-.2-3.2zM9.9 14.6V8.9l5.4 2.9-5.4 2.8z"/></svg></span>
+            <h3>يوتيوب</h3>
+          </div>
+          <div class="metric-list">
+            <div class="metric"><span class="n" data-target="10.9" data-suffix="M" data-decimals="1">٠</span><span class="l">مشاهدة</span></div>
+            <div class="metric"><span class="n" data-target="421.9" data-suffix="K" data-decimals="1">٠</span><span class="l">ساعة مشاهدة</span></div>
+            <div class="metric grow"><span class="n" data-target="48.8" data-suffix="K+" data-decimals="1">٠</span><span class="l">مشترك جديد</span></div>
+          </div>
+        </div>
+
+        <div class="platform-panel">
+          <div class="platform-head">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2.2c2.7 0 3 0 4.1.06 1.1.05 1.8.22 2.4.46.6.24 1.1.56 1.6 1.06.5.5.82 1 1.06 1.6.24.6.41 1.3.46 2.4.06 1.1.06 1.4.06 4.1s0 3-.06 4.1c-.05 1.1-.22 1.8-.46 2.4-.24.6-.56 1.1-1.06 1.6-.5.5-1 .82-1.6 1.06-.6.24-1.3.41-2.4.46-1.1.06-1.4.06-4.1.06s-3 0-4.1-.06c-1.1-.05-1.8-.22-2.4-.46-.6-.24-1.1-.56-1.6-1.06-.5-.5-.82-1-1.06-1.6-.24-.6-.41-1.3-.46-2.4C2.2 15 2.2 14.7 2.2 12s0-3 .06-4.1c.05-1.1.22-1.8.46-2.4.24-.6.56-1.1 1.06-1.6.5-.5 1-.82 1.6-1.06.6-.24 1.3-.41 2.4-.46C9 2.2 9.3 2.2 12 2.2zm0 1.8c-2.65 0-2.97 0-4.02.06-.97.04-1.5.2-1.85.34-.46.18-.8.4-1.15.75-.35.35-.57.69-.75 1.15-.14.35-.3.88-.34 1.85-.05 1.05-.06 1.37-.06 4.02s0 2.97.06 4.02c.04.97.2 1.5.34 1.85.18.46.4.8.75 1.15.35.35.69.57 1.15.75.35.14.88.3 1.85.34 1.05.05 1.37.06 4.02.06s2.97 0 4.02-.06c.97-.04 1.5-.2 1.85-.34.46-.18.8-.4 1.15-.75.35-.35.57-.69.75-1.15.14-.35.3-.88.34-1.85.05-1.05.06-1.37.06-4.02s0-2.97-.06-4.02c-.04-.97-.2-1.5-.34-1.85a3.1 3.1 0 0 0-.75-1.15 3.1 3.1 0 0 0-1.15-.75c-.35-.14-.88-.3-1.85-.34C14.97 4 14.65 4 12 4zm0 3.05a4.95 4.95 0 1 1 0 9.9 4.95 4.95 0 0 1 0-9.9zm0 1.8a3.15 3.15 0 1 0 0 6.3 3.15 3.15 0 0 0 0-6.3zm5.15-1.98a1.16 1.16 0 1 1 0 2.31 1.16 1.16 0 0 1 0-2.31z"/></svg></span>
+            <h3>انستغرام وفيسبوك</h3>
+          </div>
+          <div class="metric-list">
+            <div class="metric"><span class="n" data-target="15.3" data-suffix="M+" data-decimals="1">٠</span><span class="l">مشاهدة إجمالية</span></div>
+            <div class="metric grow"><span class="n" data-target="62.7" data-suffix="K+" data-decimals="1">٠</span><span class="l">متابع جديد (انستغرام)</span></div>
+            <div class="metric grow"><span class="n" data-target="3545" data-suffix="%+" data-decimals="0">٠</span><span class="l">نمو المتابعين</span></div>
+          </div>
+          <div class="breakdown">
+            <div class="breakdown-row"><span>مشاهدات انستغرام</span><b>10.88M</b></div>
+            <div class="breakdown-bar"><i data-width="72"></i></div>
+            <div class="breakdown-row"><span>مشاهدات فيسبوك</span><b>4.4M</b></div>
+            <div class="breakdown-bar"><i data-width="29"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow" style="justify-content:center;">لنبدأ</div>
+      <h2>عندك فكرة؟ خلّينا نحوّلها لـ لمحة</h2>
+      <p class="muted" style="margin-top:14px;">تواصل معنا مباشرة عبر واتساب وخبرنا عن مشروعك.</p>
+    </div>
+    <div class="contact-actions reveal">
+      <!-- ⬇︎ استبدل 9639XXXXXXXX برقم واتساب الشركة الحقيقي (بصيغة دولية بدون + أو صفر) -->
+      <a class="btn wa-btn" href="https://wa.me/905550960595" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.2 14.2c-.22.62-1.28 1.18-1.77 1.24-.45.06-1 .08-1.62-.1-.37-.11-.85-.28-1.46-.55-2.58-1.11-4.26-3.72-4.39-3.9-.13-.17-1.05-1.4-1.05-2.67 0-1.27.67-1.9.9-2.16.24-.26.52-.32.7-.32h.5c.16 0 .38-.06.6.45.22.53.75 1.83.82 1.96.06.13.1.29.02.47-.08.17-.13.28-.26.43-.13.15-.27.34-.39.46-.13.13-.26.27-.11.53.14.26.63 1.04 1.36 1.68.94.83 1.73 1.09 1.99 1.21.26.13.42.11.57-.07.16-.18.65-.75.82-1.01.17-.26.34-.22.57-.13.24.09 1.51.71 1.77.84.26.13.43.19.5.3.06.11.06.63-.16 1.25z"/></svg>
+        تواصل عبر واتساب
+      </a>
+      <a class="btn btn-ghost" href="#videos">شاهد أعمالنا أولاً</a>
+    </div>
+    <div class="contact-info reveal">
+      <div><b>واتساب</b>+90 555 096 0595</div>
+      <div><b>البريد الإلكتروني</b>lamhaamedia@gmail.com</div>
+      <div><b>الموقع</b>إسطنبول، تركيا</div>
+    </div>
+  </div>
+</section>
+
+<a class="float-wa" href="https://wa.me/905550960595" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.2 14.2c-.22.62-1.28 1.18-1.77 1.24-.45.06-1 .08-1.62-.1-.37-.11-.85-.28-1.46-.55-2.58-1.11-4.26-3.72-4.39-3.9-.13-.17-1.05-1.4-1.05-2.67 0-1.27.67-1.9.9-2.16.24-.26.52-.32.7-.32h.5c.16 0 .38-.06.6.45.22.53.75 1.83.82 1.96.06.13.1.29.02.47-.08.17-.13.28-.26.43-.13.15-.27.34-.39.46-.13.13-.26.27-.11.53.14.26.63 1.04 1.36 1.68.94.83 1.73 1.09 1.99 1.21.26.13.42.11.57-.07.16-.18.65-.75.82-1.01.17-.26.34-.22.57-.13.24.09 1.51.71 1.77.84.26.13.43.19.5.3.06.11.06.63-.16 1.25z"/></svg>
+</a>
+
+<footer>
+  <div class="brand"><img src="4lamha.png" alt="لمحة ميديا" style="width:30px;height:30px;"><span>لمحة ميديا</span></div>
+  <div>إنتاج · تصوير · مونتاج — إسطنبول</div>
+  <div>© 2026 لمحة ميديا. جميع الحقوق محفوظة.</div>
+</footer>
+
+<script>
+  // Preloader
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('preloader').classList.add('done'), 500);
+  });
+
+  // Scroll progress bar
+  const progressBar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = pct + '%';
+  });
+
+  // Hero cursor glow
+  const hero = document.querySelector('.hero');
+  const heroCursor = document.getElementById('heroCursor');
+  hero.addEventListener('mousemove', (e) => {
+    const r = hero.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * 100;
+    const y = ((e.clientY - r.top) / r.height) * 100;
+    hero.style.setProperty('--mx', x + '%');
+    hero.style.setProperty('--my', y + '%');
+  });
+
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll('.reveal, .grid .card');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('in');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.15, rootMargin:'0px 0px -60px 0px'});
+  revealEls.forEach(el => { el.classList.add('reveal'); revealObserver.observe(el); });
+
+  // Animated counters
+  function formatNum(val, decimals){
+    return val.toLocaleString('en-US', {minimumFractionDigits:decimals, maximumFractionDigits:decimals});
+  }
+  function animateCounter(el){
+    const target = parseFloat(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const decimals = parseInt(el.dataset.decimals || '0');
+    const duration = 1700;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = target * eased;
+      el.textContent = formatNum(val, decimals) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = formatNum(target, decimals) + suffix;
+    }
+    requestAnimationFrame(tick);
+  }
+  const counterEls = document.querySelectorAll('[data-target]');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        animateCounter(entry.target);
+        counterObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.4});
+  counterEls.forEach(el => counterObserver.observe(el));
+
+  // Breakdown bars fill
+  const barEls = document.querySelectorAll('.breakdown-bar i');
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.style.width = entry.target.dataset.width + '%';
+        barObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.3});
+  barEls.forEach(el => barObserver.observe(el));
+</script>
+
+</body>
+</html>
